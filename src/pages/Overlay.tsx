@@ -120,6 +120,14 @@ const Overlay = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const { game, loading } = useGameRealtime(gameId);
 
+  // Mark this page as an overlay route
+  useEffect(() => {
+    document.body.classList.add('overlay-route');
+    return () => {
+      document.body.classList.remove('overlay-route');
+    };
+  }, []);
+
   const timer = useCountdownTimer(
     game?.timer_remaining_sec ?? 0,
     game?.is_timer_running ?? false,
@@ -206,7 +214,7 @@ const Overlay = () => {
                   {game.home_team.logo_url && (
                     <img src={game.home_team.logo_url} alt="" className="h-16 w-16 mx-auto rounded-lg object-contain" />
                   )}
-                  <h3 className="font-display text-xl font-bold" style={{ color: game.home_team.primary_color }}>
+                  <h3 className="font-display text-xl font-bold" style={{ color: game.home_team.font_color }}>
                     {game.home_team.name_full}
                   </h3>
                   <div className="font-display text-5xl font-bold text-white">{game.home_team.score}</div>
@@ -224,7 +232,7 @@ const Overlay = () => {
                   {game.away_team.logo_url && (
                     <img src={game.away_team.logo_url} alt="" className="h-16 w-16 mx-auto rounded-lg object-contain" />
                   )}
-                  <h3 className="font-display text-xl font-bold" style={{ color: game.away_team.primary_color }}>
+                  <h3 className="font-display text-xl font-bold" style={{ color: game.away_team.font_color }}>
                     {game.away_team.name_full}
                   </h3>
                   <div className="font-display text-5xl font-bold text-white">{game.away_team.score}</div>

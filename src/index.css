@@ -107,3 +107,14 @@
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+/* Overlay page styles */
+body.overlay-route {
+  background: transparent !important;
+}
+
+body.overlay-route #root {
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
