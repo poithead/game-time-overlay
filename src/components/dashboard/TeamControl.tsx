@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import type { TeamData, GameCard } from '@/types/game';
 import { Plus, Upload, CircleAlert } from 'lucide-react';
 import { toast } from 'sonner';
+import { defaultTeam } from '@/types/game';
+import { LogoPicker } from '@/components/dashboard/LogoPicker';
+
 
 interface TeamControlProps {
   side: 'home_team' | 'away_team';
@@ -13,33 +15,17 @@ interface TeamControlProps {
   isMatchEnded: boolean;
   onUpdate: (updates: Partial<TeamData>) => void;
   onAddScore: (type: 'field_goals' | 'penalty_corners_converted' | 'penalty_strokes_converted') => void;
+  onSubtractScore: (type: 'field_goals' | 'penalty_corners_converted' | 'penalty_strokes_converted') => void;
   onAddPenaltyStat: (stat: 'penalty_corners_awarded' | 'penalty_strokes_awarded') => void;
+  onSubtractPenaltyStat: (stat: 'penalty_corners_awarded' | 'penalty_strokes_awarded') => void;
   onAddCard: (type: GameCard['type']) => void;
+  onRemoveCard: (type: GameCard['type']) => void;
 }
 
 export function TeamControl({
-  side, team, isMatchEnded, onUpdate, onAddScore, onAddPenaltyStat, onAddCard,
+  side, team, isMatchEnded, onUpdate, onAddScore, onSubtractScore, onAddPenaltyStat, onSubtractPenaltyStat, onAddCard, onRemoveCard,
 }: TeamControlProps) {
   const label = side === 'home_team' ? 'Home Team' : 'Away Team';
-  const [uploading, setUploading] = useState(false);
-
-  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const ext = file.name.split('.').pop();
-    const path = `${crypto.randomUUID()}.${ext}`;
-    const { error } = await supabase.storage.from('logos').upload(path, file);
-    if (error) {
-      toast.error('Upload failed');
-      setUploading(false);
-      return;
-    }
-    const { data: { publicUrl } } = supabase.storage.from('logos').getPublicUrl(path);
-    onUpdate({ logo_url: publicUrl });
-    setUploading(false);
-    toast.success('Logo uploaded');
-  };
 
   return (
     <div className="glass-card p-4 md:p-6 space-y-4">
@@ -67,6 +53,17 @@ export function TeamControl({
           <Plus className="h-3 w-3 mr-1" /> PS Goal
         </Button>
       </div>
+      <div className="grid grid-cols-3 gap-2 mt-2">
+        <Button size="sm" variant="outline" onClick={() => onSubtractScore('field_goals')} disabled={isMatchEnded || team.score <= 0}>
+          - FG
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => onSubtractScore('penalty_corners_converted')} disabled={isMatchEnded || team.penalty_corners_converted <= 0}>
+          - PC Goal
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => onSubtractScore('penalty_strokes_converted')} disabled={isMatchEnded || team.penalty_strokes_converted <= 0}>
+          - PS Goal
+        </Button>
+      </div>
 
       {/* Penalty stats */}
       <div className="grid grid-cols-2 gap-2">
@@ -75,6 +72,14 @@ export function TeamControl({
         </Button>
         <Button size="sm" variant="outline" onClick={() => onAddPenaltyStat('penalty_strokes_awarded')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PS Awarded
+        </Button>
+      </div>
+      <div className="grid grid-cols-2 gap-2 mt-2">
+        <Button size="sm" variant="destructive" onClick={() => onSubtractPenaltyStat('penalty_corners_awarded')} disabled={isMatchEnded || team.penalty_corners_awarded <= 0}>
+          - PC
+        </Button>
+        <Button size="sm" variant="destructive" onClick={() => onSubtractPenaltyStat('penalty_strokes_awarded')} disabled={isMatchEnded || team.penalty_strokes_awarded <= 0}>
+          - PS
         </Button>
       </div>
 
@@ -90,6 +95,17 @@ export function TeamControl({
           </Button>
           <Button size="sm" className="bg-card-red hover:bg-card-red/80 text-foreground" onClick={() => onAddCard('red')} disabled={isMatchEnded}>
             Red
+          </Button>
+        </div>
+        <div className="grid grid-cols-3 gap-2 mt-2">
+          <Button size="sm" variant="destructive" onClick={() => onRemoveCard('green')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='green').length===0}>
+            - Green
+          </Button>
+          <Button size="sm" variant="destructive" onClick={() => onRemoveCard('yellow')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='yellow').length===0}>
+            - Yellow
+          </Button>
+          <Button size="sm" variant="destructive" onClick={() => onRemoveCard('red')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='red').length===0}>
+            - Red
           </Button>
         </div>
         {team.cards.length > 0 && (
@@ -143,20 +159,24 @@ export function TeamControl({
             <Input type="color" value={team.font_color} onChange={(e) => onUpdate({ font_color: e.target.value })} className="h-8 p-1 bg-muted" />
           </div>
         </div>
+        <Button
+          variant="outline"
+          size="sm"
+          className="w-full mt-3"
+          onClick={() => {
+            const simpleSide = side === 'home_team' ? 'home' : 'away';
+            onUpdate(defaultTeam(simpleSide));
+          }}
+        >
+          Reset Team
+        </Button>
 
-        <div className="space-y-1">
-          <Label className="text-xs text-muted-foreground">Logo</Label>
-          <div className="flex gap-2 items-center">
-            {team.logo_url && <img src={team.logo_url} alt="logo" className="h-8 w-8 rounded object-contain bg-muted" />}
-            <label className="flex-1 cursor-pointer">
-              <div className="flex items-center justify-center gap-1 text-xs text-muted-foreground bg-muted border border-border rounded px-2 py-1.5 hover:bg-secondary transition-colors">
-                <Upload className="h-3 w-3" />
-                {uploading ? 'Uploading...' : 'Upload Logo'}
-              </div>
-              <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} disabled={uploading} />
-            </label>
-          </div>
-        </div>
+        <LogoPicker
+          label="Logo"
+          value={team.logo_url}
+          onChange={(u) => onUpdate({ logo_url: u })}
+          disabled={isMatchEnded}
+        />
       </div>
     </div>
   );

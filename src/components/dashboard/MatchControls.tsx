@@ -6,6 +6,8 @@ import { Switch } from '@/components/ui/switch';
 import type { Game } from '@/types/game';
 import { Play, Pause, SkipForward, Square, RotateCcw, Eye, EyeOff, Copy, ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
+import { LogoPicker } from '@/components/dashboard/LogoPicker';
 
 interface MatchControlsProps {
   game: Game;
@@ -27,6 +29,8 @@ export function MatchControls({ game, onStart, onStop, onNext, onEnd, onReset, o
     const s = sec % 60;
     return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
+
+  // scoreboard theme and other configs handled via game object (no local state needed)
 
   const copyOverlayUrl = () => {
     navigator.clipboard.writeText(overlayUrl);
@@ -113,6 +117,37 @@ export function MatchControls({ game, onStart, onStop, onNext, onEnd, onReset, o
           <Switch
             checked={game.overlay_stats_visible}
             onCheckedChange={(v) => onUpdateGame({ overlay_stats_visible: v })}
+          />
+        </div>
+
+        {/* Scoreboard theme and logo pickers */}
+        <div className="space-y-3 pt-3">
+          <div className="space-y-1">
+            <Label className="text-xs text-muted-foreground">Theme</Label>
+            <Select
+              value={game.scoreboard_theme ?? 'dark'}
+              onValueChange={(v) => onUpdateGame({ scoreboard_theme: v })}
+            >
+              <SelectTrigger className="bg-muted border-border h-8 text-sm">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="dark">Dark</SelectItem>
+                <SelectItem value="light">Light</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <LogoPicker
+            label="League Logo"
+            value={game.league_logo_url || ''}
+            onChange={(u) => onUpdateGame({ league_logo_url: u })}
+          />
+
+          <LogoPicker
+            label="Channel Logo"
+            value={game.channel_logo_url || ''}
+            onChange={(u) => onUpdateGame({ channel_logo_url: u })}
           />
         </div>
       </div>

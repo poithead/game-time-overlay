@@ -60,7 +60,7 @@ function CardDisplay({ card }: { card: GameCard }) {
   );
 }
 
-function TeamSection({ team, side }: { team: TeamData; side: 'home' | 'away' }) {
+function TeamSection({ team, side, light }: { team: TeamData; side: 'home' | 'away'; light: boolean }) {
   const prevScore = useRef(team.score);
   const [pulse, setPulse] = useState(false);
 
@@ -77,6 +77,8 @@ function TeamSection({ team, side }: { team: TeamData; side: 'home' | 'away' }) 
     if (!c.expires_at) return true;
     return new Date(c.expires_at).getTime() > Date.now();
   });
+
+  const statsText = light ? 'text-black/60' : 'text-white/60';
 
   return (
     <div className={`flex items-center gap-3 ${side === 'away' ? 'flex-row-reverse' : ''}`}>
@@ -95,7 +97,7 @@ function TeamSection({ team, side }: { team: TeamData; side: 'home' | 'away' }) 
         <span className="font-display text-sm font-bold uppercase tracking-wider" style={{ color: team.font_color }}>
           {team.name_abbr}
         </span>
-        <div className="flex gap-1.5 text-[9px] text-white/60 font-medium">
+        <div className={`flex gap-1.5 text-[9px] ${statsText} font-medium`}>
           <span>FG:{team.field_goals}</span>
           <span>PC:{team.penalty_corners_awarded}:{team.penalty_corners_converted}</span>
           <span>PS:{team.penalty_strokes_awarded}:{team.penalty_strokes_converted}</span>
@@ -108,7 +110,7 @@ function TeamSection({ team, side }: { team: TeamData; side: 'home' | 'away' }) 
       </div>
 
       {/* Score */}
-      <div className={`font-display text-4xl font-bold ${pulse ? 'score-pulse glow-score' : ''}`}
+      <div className={`font-display text-4xl font-extrabold ${pulse ? 'score-pulse glow-score' : ''}`}
         style={{ color: team.font_color }}>
         {team.score}
       </div>
@@ -134,6 +136,16 @@ const Overlay = () => {
     game?.timer_started_at ?? null
   );
 
+  const light = game?.scoreboard_theme === 'light';
+
+  const scoreboardBgClass = light ? 'bg-white/90' : '';
+  const textBase = light ? 'text-black' : 'text-white';
+  const textFaded = light ? 'text-black/70' : 'text-white/70';
+  const vsText = light ? 'text-black/60' : 'text-white/60';
+  const periodText = light ? 'text-black/70' : 'text-white/70';
+
+  const timerColor = timer > 120 ? (light ? 'text-black' : 'text-white') : timer > 30 ? 'text-yellow-400' : 'text-red-500';
+
   if (loading || !game) {
     return <div className="min-h-screen" />;
   }
@@ -151,18 +163,16 @@ const Overlay = () => {
     return `${prefix}${game.current_period}`;
   };
 
-  const timerColor = timer > 120 ? 'text-white' : timer > 30 ? 'text-yellow-400' : 'text-red-500';
-
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: 'transparent' }}>
       {/* League logo top-left */}
       {game.league_logo_url && (
-        <img src={game.league_logo_url} alt="League" className="absolute top-4 left-4 h-12 object-contain" />
+        <img src={game.league_logo_url} alt="League" className="absolute top-4 left-4 h-12 w-12 object-contain drop-shadow-lg" />
       )}
 
       {/* Channel logo top-right */}
       {game.channel_logo_url && (
-        <img src={game.channel_logo_url} alt="Channel" className="absolute top-4 right-4 h-12 object-contain" />
+        <img src={game.channel_logo_url} alt="Channel" className="absolute top-4 right-4 h-12 w-12 object-contain drop-shadow-lg" />
       )}
 
       {/* Scoreboard bar at bottom */}
@@ -170,10 +180,10 @@ const Overlay = () => {
         <motion.div
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="glass-scoreboard rounded-2xl px-6 py-3 flex items-center justify-between"
+          className={`glass-scoreboard rounded-2xl px-6 py-3 flex items-center justify-between ${scoreboardBgClass}`}
         >
           {/* Home */}
-          <TeamSection team={game.home_team} side="home" />
+          <TeamSection team={game.home_team} side="home" light={light} />
 
           {/* Center: period + timer */}
           <div className="flex flex-col items-center px-6">
@@ -183,18 +193,18 @@ const Overlay = () => {
                 initial={{ opacity: 0, y: -5 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 5 }}
-                className="font-display text-xs font-bold uppercase tracking-widest text-white/70"
+                className={`font-display text-xs font-extrabold uppercase tracking-widest ${periodText}`}
               >
                 {periodLabel()}
               </motion.span>
             </AnimatePresence>
-            <span className={`font-display text-3xl font-bold tracking-wider ${timerColor}`}>
+            <span className={`font-display text-3xl font-extrabold tracking-wider ${timerColor}`}> 
               {formatTime(timer)}
             </span>
           </div>
 
           {/* Away */}
-          <TeamSection team={game.away_team} side="away" />
+          <TeamSection team={game.away_team} side="away" light={light} />
         </motion.div>
       </div>
 
@@ -207,24 +217,24 @@ const Overlay = () => {
             exit={{ opacity: 0, scale: 0.95 }}
             className="fixed inset-0 flex items-center justify-center p-8"
           >
-            <div className="glass-scoreboard rounded-3xl p-8 max-w-2xl w-full">
+            <div className={`glass-scoreboard rounded-3xl p-8 max-w-2xl w-full ${scoreboardBgClass}`}> 
               <div className="grid grid-cols-3 gap-6">
                 {/* Home stats */}
                 <div className="text-center space-y-3">
                   {game.home_team.logo_url && (
                     <img src={game.home_team.logo_url} alt="" className="h-16 w-16 mx-auto rounded-lg object-contain" />
                   )}
-                  <h3 className="font-display text-xl font-bold" style={{ color: game.home_team.font_color }}>
+                  <h3 className="font-display text-xl font-extrabold" style={{ color: game.home_team.font_color }}>
                     {game.home_team.name_full}
                   </h3>
-                  <div className="font-display text-5xl font-bold text-white">{game.home_team.score}</div>
-                  <StatsColumn team={game.home_team} />
+                  <div className={`font-display text-5xl font-extrabold ${textBase}`}>{game.home_team.score}</div>
+                  <StatsColumn team={game.home_team} light={light} />
                 </div>
 
                 {/* VS */}
                 <div className="flex flex-col items-center justify-center">
-                  <span className="font-display text-2xl font-bold text-white/30">VS</span>
-                  <span className="font-display text-sm text-white/50 mt-2">{periodLabel()}</span>
+                  <span className={`font-display text-2xl font-extrabold ${vsText}`}>VS</span>
+                  <span className={`font-display text-sm font-bold ${periodText} mt-2`}>{periodLabel()}</span>
                 </div>
 
                 {/* Away stats */}
@@ -236,7 +246,7 @@ const Overlay = () => {
                     {game.away_team.name_full}
                   </h3>
                   <div className="font-display text-5xl font-bold text-white">{game.away_team.score}</div>
-                  <StatsColumn team={game.away_team} />
+                  <StatsColumn team={game.away_team} light={light} />
                 </div>
               </div>
             </div>
@@ -247,20 +257,21 @@ const Overlay = () => {
   );
 };
 
-function StatsColumn({ team }: { team: TeamData }) {
+function StatsColumn({ team, light }: { team: TeamData; light: boolean }) {
+  const containerText = light ? 'text-black font-bold' : 'text-white/90 font-bold';
+  const valueText = light ? 'text-black' : 'text-white';
   return (
-    <div className="space-y-1 text-sm text-white/70">
-      <div className="flex justify-between">
-        <span>Field Goals</span><span className="font-bold text-white">{team.field_goals}</span>
+    <div className={`space-y-1 text-sm ${containerText}`}>      <div className="flex justify-between">
+        <span>Field Goals</span><span className={`font-bold ${valueText}`}>{team.field_goals}</span>
       </div>
       <div className="flex justify-between">
-        <span>PC (A:C)</span><span className="font-bold text-white">{team.penalty_corners_awarded}:{team.penalty_corners_converted}</span>
+        <span>PC (A:C)</span><span className={`font-bold ${valueText}`}>{team.penalty_corners_awarded}:{team.penalty_corners_converted}</span>
       </div>
       <div className="flex justify-between">
-        <span>PS (A:C)</span><span className="font-bold text-white">{team.penalty_strokes_awarded}:{team.penalty_strokes_converted}</span>
+        <span>PS (A:C)</span><span className={`font-bold ${valueText}`}>{team.penalty_strokes_awarded}:{team.penalty_strokes_converted}</span>
       </div>
       <div className="flex justify-between">
-        <span>Cards</span><span className="font-bold text-white">{team.cards.length}</span>
+        <span>Cards</span><span className={`font-bold ${valueText}`}>{team.cards.length}</span>
       </div>
     </div>
   );

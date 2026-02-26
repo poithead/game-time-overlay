@@ -48,7 +48,7 @@ export function useGame(userId: string | undefined) {
     if (!userId) return;
     const { data, error } = await supabase
       .from('games')
-      .insert({ owner_id: userId })
+      .insert({ owner_id: userId, scoreboard_theme: 'dark' })
       .select()
       .single();
     if (data) setGame(data as unknown as Game);
@@ -77,12 +77,42 @@ export function useGame(userId: string | undefined) {
     await updateTeam(side, updates);
   };
 
+  const subtractScore = async (side: 'home_team' | 'away_team', scoreType: 'field_goals' | 'penalty_corners_converted' | 'penalty_strokes_converted') => {
+    if (!game || game.is_match_ended) return;
+    const team = game[side];
+    const currentStat = team[scoreType] as number;
+    if (team.score <= 0 || currentStat <= 0) return;
+    const updates: Partial<TeamData> = {
+      score: team.score - 1,
+      [scoreType]: currentStat - 1,
+    };
+    await updateTeam(side, updates);
+  };
+
   const addPenaltyStat = async (side: 'home_team' | 'away_team', stat: 'penalty_corners_awarded' | 'penalty_strokes_awarded') => {
     if (!game || game.is_match_ended) return;
     const team = game[side];
     await updateTeam(side, { [stat]: (team[stat] as number) + 1 });
   };
 
+  const subtractPenaltyStat = async (side: 'home_team' | 'away_team', stat: 'penalty_corners_awarded' | 'penalty_strokes_awarded') => {
+    if (!game || game.is_match_ended) return;
+    const team = game[side];
+    const current = team[stat] as number;
+    if (current <= 0) return;
+    await updateTeam(side, { [stat]: current - 1 });
+  };
+  const removeCard = async (side: 'home_team' | 'away_team', type: GameCard['type']) => {
+    if (!game || game.is_match_ended) return;
+    const team = game[side];
+    // remove last card of given type
+    const idx = [...team.cards].reverse().findIndex(c => c.type === type);
+    if (idx === -1) return;
+    // calculate actual index from end
+    const realIdx = team.cards.length - 1 - idx;
+    const newCards = team.cards.filter((_, i) => i !== realIdx);
+    await updateTeam(side, { cards: newCards });
+  };
   const addCard = async (side: 'home_team' | 'away_team', type: GameCard['type']) => {
     if (!game || game.is_match_ended) return;
     const team = game[side];
@@ -142,10 +172,21 @@ export function useGame(userId: string | undefined) {
 
   const resetGame = async () => {
     if (!game) return;
-    const { defaultTeam } = await import('@/types/game');
+    // only clear scores, stats, periods and timer; keep team configuration/colors/logos
+    const resetTeamStats = (t: TeamData): TeamData => ({
+      ...t,
+      score: 0,
+      field_goals: 0,
+      penalty_corners_awarded: 0,
+      penalty_corners_converted: 0,
+      penalty_strokes_awarded: 0,
+      penalty_strokes_converted: 0,
+      cards: [],
+    });
+
     await updateGame({
-      home_team: defaultTeam('home'),
-      away_team: defaultTeam('away'),
+      home_team: resetTeamStats(game.home_team),
+      away_team: resetTeamStats(game.away_team),
       current_period: 0,
       timer_remaining_sec: game.game_format.duration_sec,
       is_timer_running: false,
@@ -157,7 +198,7 @@ export function useGame(userId: string | undefined) {
 
   return {
     game, loading, createGame, updateGame, updateTeam,
-    addScore, addPenaltyStat, addCard,
+    addScore, subtractScore, addPenaltyStat, subtractPenaltyStat, addCard, removeCard,
     startPeriod, stopPeriod, nextPeriod, endMatch, resetGame,
   };
 }

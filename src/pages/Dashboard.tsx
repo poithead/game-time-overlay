@@ -9,7 +9,7 @@ const Dashboard = () => {
   const { user, signOut } = useAuth();
   const {
     game, loading, createGame, updateGame, updateTeam,
-    addScore, addPenaltyStat, addCard,
+    addScore, subtractScore, addPenaltyStat, subtractPenaltyStat, addCard, removeCard,
     startPeriod, stopPeriod, nextPeriod, endMatch, resetGame,
   } = useGame(user?.id);
 
@@ -38,7 +38,7 @@ const Dashboard = () => {
         </div>
       </header>
 
-      <main className="container py-6 space-y-6">
+      <main className="container py-10 space-y-10">
         {!game ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
             <h2 className="font-display text-3xl text-foreground">No Active Game</h2>
@@ -57,8 +57,11 @@ const Dashboard = () => {
                 isMatchEnded={game.is_match_ended}
                 onUpdate={(u) => updateTeam('home_team', u)}
                 onAddScore={(t) => addScore('home_team', t)}
+                onSubtractScore={(t) => subtractScore('home_team', t)}
                 onAddPenaltyStat={(s) => addPenaltyStat('home_team', s)}
+                onSubtractPenaltyStat={(s) => subtractPenaltyStat('home_team', s)}
                 onAddCard={(t) => addCard('home_team', t)}
+                onRemoveCard={(t) => removeCard('home_team', t)}
               />
               <TeamControl
                 side="away_team"
@@ -66,21 +69,26 @@ const Dashboard = () => {
                 isMatchEnded={game.is_match_ended}
                 onUpdate={(u) => updateTeam('away_team', u)}
                 onAddScore={(t) => addScore('away_team', t)}
+                onSubtractScore={(t) => subtractScore('away_team', t)}
                 onAddPenaltyStat={(s) => addPenaltyStat('away_team', s)}
+                onSubtractPenaltyStat={(s) => subtractPenaltyStat('away_team', s)}
                 onAddCard={(t) => addCard('away_team', t)}
+                onRemoveCard={(t) => removeCard('away_team', t)}
               />
             </div>
 
             {/* Match controls */}
-            <MatchControls
-              game={game}
-              onStart={startPeriod}
-              onStop={stopPeriod}
-              onNext={nextPeriod}
-              onEnd={endMatch}
-              onReset={resetGame}
-              onUpdateGame={updateGame}
-            />
+            <div className="mt-8">
+              <MatchControls
+                game={game}
+                onStart={startPeriod}
+                onStop={stopPeriod}
+                onNext={nextPeriod}
+                onEnd={endMatch}
+                onReset={resetGame}
+                onUpdateGame={updateGame}
+              />
+            </div>
           </>
         )}
       </main>

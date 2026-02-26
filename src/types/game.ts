@@ -39,6 +39,7 @@ export interface Game {
   league_logo_url: string | null;
   channel_logo_url: string | null;
   overlay_stats_visible: boolean;
+  scoreboard_theme: 'dark' | 'light';
   created_at: string;
   updated_at: string;
 }

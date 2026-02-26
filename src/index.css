@@ -39,6 +39,7 @@
     /* Custom tokens */
     --glass: 222 47% 11% / 0.7;
     --glass-border: 217 33% 25% / 0.5;
+    --glass-overlay: 222 47% 11% / 0.85;
     --score-glow: 142 71% 45%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
@@ -117,4 +118,9 @@ body.overlay-route #root {
   margin: 0 !important;
   padding: 0 !important;
   text-align: left !important;
+}
+
+/* less transparent scoreboard on overlay */
+body.overlay-route .glass-scoreboard {
+  background: hsla(var(--glass-overlay));
 }
