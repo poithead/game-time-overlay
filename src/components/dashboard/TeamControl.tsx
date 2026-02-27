@@ -98,10 +98,10 @@ export function TeamControl({
       </div>
       <div className="grid grid-cols-2 gap-2 mt-2">
         <Button size="sm" variant="outline" className="hover:bg-destructive hover:text-destructive-foreground" onClick={() => onSubtractPenaltyStat('penalty_corners_awarded')} disabled={isMatchEnded || team.penalty_corners_awarded <= 0}>
-          - PC
+          - PC Awarded
         </Button>
         <Button size="sm" variant="outline" className="hover:bg-destructive hover:text-destructive-foreground" onClick={() => onSubtractPenaltyStat('penalty_strokes_awarded')} disabled={isMatchEnded || team.penalty_strokes_awarded <= 0}>
-          - PS
+          - PS Awarded
         </Button>
       </div>
 
