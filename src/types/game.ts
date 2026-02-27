@@ -42,6 +42,8 @@ export interface Game {
   channel_logo_url: string | null;
   overlay_stats_visible: boolean;
   scoreboard_theme: 'dark' | 'light';
+  // show floating statistical reactions on overlay
+  reactions_enabled: boolean;
   created_at: string;
   updated_at: string;
 }

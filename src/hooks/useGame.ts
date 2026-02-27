@@ -53,6 +53,7 @@ export function useGame(gameId: string | undefined) {
       .insert({ 
         owner_id: userId, 
         scoreboard_theme: 'dark',
+        reactions_enabled: true,
         name: defaultName
       })
       .select()

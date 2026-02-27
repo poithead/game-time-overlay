@@ -141,6 +141,55 @@ const Overlay = () => {
   const [startPos, setStartPos] = useState<number>(0);
   const [endPos, setEndPos] = useState<number>(0);
 
+  // reactions displayed when stats increment
+  const [reactions, setReactions] = useState<
+    { id: string; team: 'home' | 'away'; text: string }[]
+  >([]);
+  const prevGameRef = useRef<typeof game | null>(null);
+
+  const addReaction = (team: 'home' | 'away', text: string) => {
+    const id = `${Date.now()}-${Math.random()}`;
+    setReactions(r => [...r, { id, team, text }]);
+    // remove after 2s
+    setTimeout(() => {
+      setReactions(r => r.filter(x => x.id !== id));
+    }, 2000);
+  };
+
+  useEffect(() => {
+    if (!game) return;
+    // clear reactions when disabled
+    if (!game.reactions_enabled) {
+      setReactions([]);
+      prevGameRef.current = game;
+      return;
+    }
+    const prev = prevGameRef.current;
+    if (prev) {
+      const deltas: Array<{
+        stat: keyof TeamData;
+        text: string;
+      }> = [
+        { stat: 'field_goals', text: '+1 Field Goal!' },
+        { stat: 'penalty_corners_awarded', text: '+1 Penalty Corner!' },
+        { stat: 'penalty_corners_converted', text: '+1 PC Converted!' },
+        { stat: 'penalty_strokes_awarded', text: '+1 Penalty Stroke!' },
+        { stat: 'penalty_strokes_converted', text: '+1 PS Converted!' },
+      ];
+      deltas.forEach(d => {
+        const homeCurrent = Number(game.home_team[d.stat] ?? 0);
+        const homePrev = Number(prev.home_team[d.stat] ?? 0);
+        const awayCurrent = Number(game.away_team[d.stat] ?? 0);
+        const awayPrev = Number(prev.away_team[d.stat] ?? 0);
+        const homeDelta = homeCurrent - homePrev;
+        const awayDelta = awayCurrent - awayPrev;
+        if (homeDelta > 0) addReaction('home', d.text);
+        if (awayDelta > 0) addReaction('away', d.text);
+      });
+    }
+    prevGameRef.current = game;
+  }, [game]);
+
   useEffect(() => {
     const compute = () => {
       if (!game?.description || !tickerRef.current) return;
@@ -195,6 +244,20 @@ const Overlay = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: 'transparent' }}>
+      {/* League logo - shared position across all overlays */}
+      {game.league_logo_url && (
+        <motion.img
+          layoutId="league-logo"
+          src={game.league_logo_url}
+          alt="League"
+          className="fixed h-14 w-14 object-contain drop-shadow-lg opacity-90 z-10 left-1/2 -translate-x-1/2"
+          animate={{
+            bottom: game.overlay_stats_visible ? 'auto' : '6.5rem',
+            top: game.overlay_stats_visible ? 'calc(50% - 10rem)' : 'auto',
+          }}
+          transition={{ duration: 0.3, ease: 'easeInOut' }}
+        />
+      )}
       {/* Channel logo top-right */}
       {game.channel_logo_url && (
         <img src={game.channel_logo_url} alt="Channel" className="absolute top-4 right-4 h-12 w-12 object-contain drop-shadow-lg" />
@@ -204,14 +267,23 @@ const Overlay = () => {
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-4xl">
         {/* scoreboard wrapper so logo can overlap */}
         <div className="relative flex flex-col items-center">
-          {game.league_logo_url && (
-            <img
-              src={game.league_logo_url}
-              alt="League"
-              style={{ top: '-50%' }}
-              className="absolute left-1/2 -translate-x-1/2 h-14 w-14 object-contain drop-shadow-lg opacity-90 z-10"
-            />
-          )}
+          {/* floating reactions */}
+          <AnimatePresence>
+            {reactions.map(r => (
+              <motion.div
+                key={r.id}
+                initial={{ opacity: 0, y: 0 }}
+                animate={{ opacity: 1, y: -30 }}
+                exit={{ opacity: 0, y: -60 }}
+                className={`absolute bottom-full mb-2 ${
+                  r.team === 'home' ? 'left-8' : 'right-8'
+                } z-20 bg-white/90 text-black rounded-full px-3 py-1 text-sm font-bold shadow-lg`}
+                style={{ pointerEvents: 'none' }}
+              >
+                {r.text}
+              </motion.div>
+            ))}
+          </AnimatePresence>
           <motion.div
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -274,7 +346,7 @@ const Overlay = () => {
             exit={{ opacity: 0, scale: 0.95 }}
             className="fixed inset-0 flex items-center justify-center p-8"
           >
-            <div className={`glass-scoreboard rounded-3xl p-8 max-w-2xl w-full ${scoreboardBgClass}`}> 
+            <div className={`relative glass-scoreboard rounded-3xl p-8 max-w-2xl w-full ${scoreboardBgClass}`}> 
               <div className="grid grid-cols-3 gap-6">
                 {/* Home stats */}
                 <div className="text-center space-y-3">

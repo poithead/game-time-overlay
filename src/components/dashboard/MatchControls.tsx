@@ -119,6 +119,13 @@ export function MatchControls({ game, onStart, onStop, onNext, onEnd, onReset, o
             onCheckedChange={(v) => onUpdateGame({ overlay_stats_visible: v })}
           />
         </div>
+        <div className="flex items-center justify-between">
+          <Label className="text-xs text-muted-foreground">Show Reactions</Label>
+          <Switch
+            checked={game.reactions_enabled}
+            onCheckedChange={(v) => onUpdateGame({ reactions_enabled: v })}
+          />
+        </div>
 
         {/* Scoreboard theme and logo pickers */}
         <div className="space-y-3 pt-3">
