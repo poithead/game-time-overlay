@@ -164,14 +164,10 @@ export function TeamControl({
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Primary</Label>
             <Input type="color" value={team.primary_color} onChange={(e) => onUpdate({ primary_color: e.target.value })} className="h-8 p-1 bg-muted" />
-          </div>
-          <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">Secondary</Label>
-            <Input type="color" value={team.secondary_color} onChange={(e) => onUpdate({ secondary_color: e.target.value })} className="h-8 p-1 bg-muted" />
           </div>
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Font</Label>
