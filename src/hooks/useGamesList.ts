@@ -65,5 +65,9 @@ export function useGamesList(userId: string | undefined) {
     }
   };
 
-  return { games, loading, deleteGame };
+  const addGame = (game: Game) => {
+    setGames(prev => [game, ...prev]);
+  };
+
+  return { games, loading, deleteGame, addGame };
 }

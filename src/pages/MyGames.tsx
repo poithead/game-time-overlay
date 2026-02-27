@@ -22,7 +22,7 @@ import {
 
 const MyGames = () => {
   const { user, signOut } = useAuth();
-  const { games, loading: gamesLoading, deleteGame } = useGamesList(user?.id);
+  const { games, loading: gamesLoading, deleteGame, addGame } = useGamesList(user?.id);
   const { profile, loading: profileLoading, toggleTheme } = useProfile(user?.id);
   const { createGame } = useGame(undefined);
   const navigate = useNavigate();
@@ -34,11 +34,11 @@ const MyGames = () => {
     const newGame = await createGame(user.id);
     setCreating(false);
     if (newGame) {
+      addGame(newGame);
       toast({
         title: 'Success',
         description: 'Game created successfully',
       });
-      // List will update via realtime subscription
     }
   };
 
