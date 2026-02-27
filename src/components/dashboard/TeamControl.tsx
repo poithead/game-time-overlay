@@ -27,6 +27,34 @@ export function TeamControl({
 }: TeamControlProps) {
   const label = side === 'home_team' ? 'Home Team' : 'Away Team';
 
+  const [localAbbr, setLocalAbbr] = useState(team.name_abbr);
+  const [localFull, setLocalFull] = useState(team.name_full);
+  const abbrTimer = useRef<number>();
+  const fullTimer = useRef<number>();
+
+  // sync when parent changes
+  useEffect(() => {
+    setLocalAbbr(team.name_abbr);
+  }, [team.name_abbr]);
+  useEffect(() => {
+    setLocalFull(team.name_full);
+  }, [team.name_full]);
+
+  const scheduleAbbr = (value: string) => {
+    setLocalAbbr(value);
+    window.clearTimeout(abbrTimer.current);
+    abbrTimer.current = window.setTimeout(() => {
+      onUpdate({ name_abbr: value.toUpperCase() });
+    }, 300);
+  };
+  const scheduleFull = (value: string) => {
+    setLocalFull(value);
+    window.clearTimeout(fullTimer.current);
+    fullTimer.current = window.setTimeout(() => {
+      onUpdate({ name_full: value });
+    }, 300);
+  };
+
   return (
     <div className="glass-card p-4 md:p-6 space-y-4">
       <h3
@@ -129,17 +157,17 @@ export function TeamControl({
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Abbreviation</Label>
             <Input
-              value={team.name_abbr}
+              value={localAbbr}
               maxLength={10}
-              onChange={(e) => onUpdate({ name_abbr: e.target.value.toUpperCase() })}
+              onChange={(e) => scheduleAbbr(e.target.value)}
               className="bg-muted border-border text-sm h-8"
             />
           </div>
           <div className="space-y-1">
             <Label className="text-xs text-muted-foreground">Full Name</Label>
             <Input
-              value={team.name_full}
-              onChange={(e) => onUpdate({ name_full: e.target.value })}
+              value={localFull}
+              onChange={(e) => scheduleFull(e.target.value)}
               className="bg-muted border-border text-sm h-8"
             />
           </div>
