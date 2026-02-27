@@ -40,7 +40,10 @@ export function useGamesList(userId: string | undefined) {
       }, (payload) => {
         if (payload.eventType === 'INSERT') {
           const newGame = payload.new as unknown as Game;
-          setGames(prev => [newGame, ...prev]);
+          setGames(prev => {
+            if (prev.some(g => g.id === newGame.id)) return prev;
+            return [newGame, ...prev];
+          });
         } else if (payload.eventType === 'UPDATE') {
           const updatedGame = payload.new as unknown as Game;
           setGames(prev => prev.map(g => g.id === updatedGame.id ? updatedGame : g));

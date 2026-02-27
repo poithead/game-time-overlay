@@ -30,8 +30,9 @@ const MyGames = () => {
 
   const handleCreateGame = async () => {
     if (!user?.id) return;
+    const name = window.prompt('Enter a name for the new game', `Game ${new Date().toLocaleDateString()}`) || undefined;
     setCreating(true);
-    const newGame = await createGame(user.id);
+    const newGame = await createGame(user.id, name);
     setCreating(false);
     if (newGame) {
       addGame(newGame);
@@ -162,6 +163,9 @@ const MyGames = () => {
                     <h3 className="font-display text-lg font-bold text-foreground line-clamp-1">
                       {game.name}
                     </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Created {new Date(game.created_at).toLocaleDateString()}
+                    </p>
                     <p
                       className="text-sm text-muted-foreground line-clamp-1 mt-1 flex items-center gap-1 cursor-pointer"
                       onClick={() => handleEditDescription(game)}
@@ -253,7 +257,6 @@ const MyGames = () => {
                         <span className="inline-block px-2 py-0.5 bg-gray-500 text-white rounded-full text-[10px]">Not Started</span>
                       )}
                     </p>
-                    <p>Created {new Date(game.created_at).toLocaleDateString()}</p>
                   </div>
 
                   {/* Action buttons */}
