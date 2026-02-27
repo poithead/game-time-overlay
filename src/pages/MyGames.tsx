@@ -288,7 +288,7 @@ const MyGames = () => {
                     <Button
                       onClick={() => handleCopyOverlayUrl(game.id)}
                       size="sm"
-                      variant="outline"n
+                      variant="outline"
                       className="font-display"
                     >
                       <Copy className="h-3.5 w-3.5 mr-1" /> Copy Overlay URL
