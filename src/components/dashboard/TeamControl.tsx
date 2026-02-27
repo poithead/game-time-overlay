@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -29,10 +29,8 @@ export function TeamControl({
 
   const [localAbbr, setLocalAbbr] = useState(team.name_abbr);
   const [localFull, setLocalFull] = useState(team.name_full);
-  const abbrTimer = useRef<number>();
-  const fullTimer = useRef<number>();
 
-  // sync when parent changes
+  // sync when parent changes (e.g. reset)
   useEffect(() => {
     setLocalAbbr(team.name_abbr);
   }, [team.name_abbr]);
@@ -40,19 +38,15 @@ export function TeamControl({
     setLocalFull(team.name_full);
   }, [team.name_full]);
 
-  const scheduleAbbr = (value: string) => {
-    setLocalAbbr(value);
-    window.clearTimeout(abbrTimer.current);
-    abbrTimer.current = window.setTimeout(() => {
-      onUpdate({ name_abbr: value.toUpperCase() });
-    }, 300);
+  const commitAbbr = () => {
+    if (localAbbr !== team.name_abbr) {
+      onUpdate({ name_abbr: localAbbr.toUpperCase() });
+    }
   };
-  const scheduleFull = (value: string) => {
-    setLocalFull(value);
-    window.clearTimeout(fullTimer.current);
-    fullTimer.current = window.setTimeout(() => {
-      onUpdate({ name_full: value });
-    }, 300);
+  const commitFull = () => {
+    if (localFull !== team.name_full) {
+      onUpdate({ name_full: localFull });
+    }
   };
 
   return (
@@ -159,7 +153,8 @@ export function TeamControl({
             <Input
               value={localAbbr}
               maxLength={10}
-              onChange={(e) => scheduleAbbr(e.target.value)}
+              onChange={(e) => setLocalAbbr(e.target.value)}
+              onBlur={commitAbbr}
               className="bg-muted border-border text-sm h-8"
             />
           </div>
@@ -167,7 +162,8 @@ export function TeamControl({
             <Label className="text-xs text-muted-foreground">Full Name</Label>
             <Input
               value={localFull}
-              onChange={(e) => scheduleFull(e.target.value)}
+              onChange={(e) => setLocalFull(e.target.value)}
+              onBlur={commitFull}
               className="bg-muted border-border text-sm h-8"
             />
           </div>
