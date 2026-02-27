@@ -65,13 +65,13 @@ export function TeamControl({
 
       {/* Score buttons */}
       <div className="grid grid-cols-3 gap-2">
-        <Button size="sm" variant="outline" className="hover:bg-green-500/20" onClick={() => onAddScore('field_goals')} disabled={isMatchEnded}>
+        <Button size="sm" variant="outline" className="hover:bg-green-500 hover:text-white" onClick={() => onAddScore('field_goals')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> FG
         </Button>
-        <Button size="sm" variant="outline" className="hover:bg-green-500/20" onClick={() => onAddScore('penalty_corners_converted')} disabled={isMatchEnded}>
+        <Button size="sm" variant="outline" className="hover:bg-green-500 hover:text-white" onClick={() => onAddScore('penalty_corners_converted')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PC Goal
         </Button>
-        <Button size="sm" variant="outline" className="hover:bg-green-500/20" onClick={() => onAddScore('penalty_strokes_converted')} disabled={isMatchEnded}>
+        <Button size="sm" variant="outline" className="hover:bg-green-500 hover:text-white" onClick={() => onAddScore('penalty_strokes_converted')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PS Goal
         </Button>
       </div>
@@ -89,10 +89,10 @@ export function TeamControl({
 
       {/* Penalty stats */}
       <div className="grid grid-cols-2 gap-2">
-        <Button size="sm" variant="outline" className="hover:bg-green-500/20" onClick={() => onAddPenaltyStat('penalty_corners_awarded')} disabled={isMatchEnded}>
+        <Button size="sm" variant="outline" className="hover:bg-green-500 hover:text-white" onClick={() => onAddPenaltyStat('penalty_corners_awarded')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PC Awarded
         </Button>
-        <Button size="sm" variant="outline" className="hover:bg-green-500/20" onClick={() => onAddPenaltyStat('penalty_strokes_awarded')} disabled={isMatchEnded}>
+        <Button size="sm" variant="outline" className="hover:bg-green-500 hover:text-white" onClick={() => onAddPenaltyStat('penalty_strokes_awarded')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PS Awarded
         </Button>
       </div>
