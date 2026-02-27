@@ -222,6 +222,9 @@ const Overlay = () => {
   const textFaded = light ? 'text-black/70' : 'text-white/70';
   const vsText = light ? 'text-black/60' : 'text-white/60';
   const periodText = light ? 'text-black/70' : 'text-white/70';
+  // ticker should be opposite of scoreboard theme
+  const tickerBg = light ? '!bg-black/90' : '!bg-white/90';
+  const tickerTextColor = light ? 'text-white' : 'text-black';
 
   const timerColor = timer > 120 ? (light ? 'text-black' : 'text-white') : timer > 30 ? 'text-yellow-400' : 'text-red-500';
 
@@ -252,8 +255,8 @@ const Overlay = () => {
           alt="League"
           className="fixed h-14 w-14 object-contain drop-shadow-lg opacity-90 z-10 left-1/2 -translate-x-1/2"
           animate={{
-            bottom: game.overlay_stats_visible ? 'auto' : '6.5rem',
-            top: game.overlay_stats_visible ? 'calc(50% - 12rem)' : 'auto',
+            bottom: game.overlay_stats_visible ? 'auto' : '7rem',
+            top: game.overlay_stats_visible ? 'calc(50% - 13rem)' : 'auto',
           }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
         />
@@ -321,9 +324,9 @@ const Overlay = () => {
 
           {/* Ticker / description row (merged) */}
           {game.description && (
-            <div className="w-full overflow-hidden mt-1" ref={tickerRef}>
+            <div className={`w-full overflow-hidden mt-1 ${tickerBg}`} ref={tickerRef}>
               <div
-                className={`ticker-animation whitespace-nowrap ${light ? 'text-black' : 'text-white'}`}
+                className={`ticker-animation whitespace-nowrap ${tickerTextColor}`}
                 style={{
                   '--ticker-start': `${startPos}px`,
                   '--ticker-end': `${endPos}px`,
