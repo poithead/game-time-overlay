@@ -291,7 +291,7 @@ const MyGames = () => {
                       variant="outline"
                       className="font-display"
                     >
-                      <Copy className="h-3.5 w-3.5 mr-1" /> Copy
+                      <Copy className="h-3.5 w-3.5 mr-1" /> Copy Overlay URL
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
