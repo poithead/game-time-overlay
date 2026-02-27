@@ -65,34 +65,34 @@ export function TeamControl({
 
       {/* Score buttons */}
       <div className="grid grid-cols-3 gap-2">
-        <Button size="sm" variant="secondary" onClick={() => onAddScore('field_goals')} disabled={isMatchEnded}>
+        <Button size="sm" variant="secondary" className="hover:bg-green-500/20" onClick={() => onAddScore('field_goals')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> FG
         </Button>
-        <Button size="sm" variant="secondary" onClick={() => onAddScore('penalty_corners_converted')} disabled={isMatchEnded}>
+        <Button size="sm" variant="secondary" className="hover:bg-green-500/20" onClick={() => onAddScore('penalty_corners_converted')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PC Goal
         </Button>
-        <Button size="sm" variant="secondary" onClick={() => onAddScore('penalty_strokes_converted')} disabled={isMatchEnded}>
+        <Button size="sm" variant="secondary" className="hover:bg-green-500/20" onClick={() => onAddScore('penalty_strokes_converted')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PS Goal
         </Button>
       </div>
       <div className="grid grid-cols-3 gap-2 mt-2">
-        <Button size="sm" variant="outline" onClick={() => onSubtractScore('field_goals')} disabled={isMatchEnded || team.score <= 0}>
+        <Button size="sm" variant="outline" className="hover:bg-red-500/20" onClick={() => onSubtractScore('field_goals')} disabled={isMatchEnded || team.score <= 0}>
           - FG
         </Button>
-        <Button size="sm" variant="outline" onClick={() => onSubtractScore('penalty_corners_converted')} disabled={isMatchEnded || team.penalty_corners_converted <= 0}>
+        <Button size="sm" variant="outline" className="hover:bg-red-500/20" onClick={() => onSubtractScore('penalty_corners_converted')} disabled={isMatchEnded || team.penalty_corners_converted <= 0}>
           - PC Goal
         </Button>
-        <Button size="sm" variant="outline" onClick={() => onSubtractScore('penalty_strokes_converted')} disabled={isMatchEnded || team.penalty_strokes_converted <= 0}>
+        <Button size="sm" variant="outline" className="hover:bg-red-500/20" onClick={() => onSubtractScore('penalty_strokes_converted')} disabled={isMatchEnded || team.penalty_strokes_converted <= 0}>
           - PS Goal
         </Button>
       </div>
 
       {/* Penalty stats */}
       <div className="grid grid-cols-2 gap-2">
-        <Button size="sm" variant="outline" onClick={() => onAddPenaltyStat('penalty_corners_awarded')} disabled={isMatchEnded}>
+        <Button size="sm" variant="outline" className="hover:bg-green-500/20" onClick={() => onAddPenaltyStat('penalty_corners_awarded')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PC Awarded
         </Button>
-        <Button size="sm" variant="outline" onClick={() => onAddPenaltyStat('penalty_strokes_awarded')} disabled={isMatchEnded}>
+        <Button size="sm" variant="outline" className="hover:bg-green-500/20" onClick={() => onAddPenaltyStat('penalty_strokes_awarded')} disabled={isMatchEnded}>
           <Plus className="h-3 w-3 mr-1" /> PS Awarded
         </Button>
       </div>
@@ -120,13 +120,13 @@ export function TeamControl({
           </Button>
         </div>
         <div className="grid grid-cols-3 gap-2 mt-2">
-          <Button size="sm" variant="destructive" onClick={() => onRemoveCard('green')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='green').length===0}>
+          <Button size="sm" variant="outline" className="hover:bg-red-500/20" onClick={() => onRemoveCard('green')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='green').length===0}>
             - Green
           </Button>
-          <Button size="sm" variant="destructive" onClick={() => onRemoveCard('yellow')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='yellow').length===0}>
+          <Button size="sm" variant="outline" className="hover:bg-red-500/20" onClick={() => onRemoveCard('yellow')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='yellow').length===0}>
             - Yellow
           </Button>
-          <Button size="sm" variant="destructive" onClick={() => onRemoveCard('red')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='red').length===0}>
+          <Button size="sm" variant="outline" className="hover:bg-red-500/20" onClick={() => onRemoveCard('red')} disabled={isMatchEnded || team.cards.filter(c=>c.type==='red').length===0}>
             - Red
           </Button>
         </div>
