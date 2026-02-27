@@ -51,12 +51,7 @@ export function TeamControl({
 
   return (
     <div className="glass-card p-4 md:p-6 space-y-4">
-      <h3
-        className="font-display text-xl font-bold tracking-wide uppercase"
-        style={{ color: team.primary_color }}
-      >
-        {label}
-      </h3>
+      <h3 className="font-display text-xl font-bold tracking-wide uppercase text-foreground">{label}</h3>
 
       {/* Score display */}
       <div className="flex items-center justify-center gap-4 py-3">
