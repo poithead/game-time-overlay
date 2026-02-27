@@ -30,6 +30,7 @@ export type Database = {
           name: string
           overlay_stats_visible: boolean
           owner_id: string
+          reactions_enabled: boolean
           scoreboard_theme: string
           timer_remaining_sec: number
           timer_started_at: string | null
@@ -50,6 +51,7 @@ export type Database = {
           name?: string
           overlay_stats_visible?: boolean
           owner_id: string
+          reactions_enabled?: boolean
           scoreboard_theme?: string
           timer_remaining_sec?: number
           timer_started_at?: string | null
@@ -70,6 +72,7 @@ export type Database = {
           name?: string
           overlay_stats_visible?: boolean
           owner_id?: string
+          reactions_enabled?: boolean
           scoreboard_theme?: string
           timer_remaining_sec?: number
           timer_started_at?: string | null
@@ -79,22 +82,22 @@ export type Database = {
       }
       profiles: {
         Row: {
-          id: string
           app_theme: string
-          created_at: string
-          updated_at: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
         }
         Insert: {
-          id: string
           app_theme?: string
-          created_at?: string
-          updated_at?: string
+          created_at?: string | null
+          id: string
+          updated_at?: string | null
         }
         Update: {
-          id?: string
           app_theme?: string
-          created_at?: string
-          updated_at?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
         }
         Relationships: []
       }
