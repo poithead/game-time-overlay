@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,6 +9,30 @@ import { Play, Pause, SkipForward, Square, RotateCcw, Eye, EyeOff, Copy, Externa
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { LogoPicker } from '@/components/dashboard/LogoPicker';
+
+function useCountdownTimer(
+  timerRemaining: number,
+  isRunning: boolean,
+  startedAt: string | null
+) {
+  const [display, setDisplay] = useState(timerRemaining);
+
+  useEffect(() => {
+    if (!isRunning || !startedAt) {
+      setDisplay(timerRemaining);
+      return;
+    }
+    const tick = () => {
+      const elapsed = Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000);
+      setDisplay(Math.max(0, timerRemaining - elapsed));
+    };
+    tick();
+    const interval = setInterval(tick, 200);
+    return () => clearInterval(interval);
+  }, [timerRemaining, isRunning, startedAt]);
+
+  return display;
+}
 
 interface MatchControlsProps {
   game: Game;
@@ -23,6 +48,12 @@ export function MatchControls({ game, onStart, onStop, onNext, onEnd, onReset, o
   const periodLabel = game.game_format.type === 'quarters' ? 'Quarter' : 'Half';
   const maxPeriods = game.game_format.type === 'quarters' ? 4 : 2;
   const overlayUrl = `${window.location.origin}/overlay/${game.id}`;
+
+  const timer = useCountdownTimer(
+    game.timer_remaining_sec,
+    game.is_timer_running,
+    game.timer_started_at ?? null
+  );
 
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -44,7 +75,7 @@ export function MatchControls({ game, onStart, onStop, onNext, onEnd, onReset, o
       {/* Timer display */}
       <div className="text-center py-4">
         <div className="font-display text-5xl font-bold text-foreground tracking-wider">
-          {formatTime(game.timer_remaining_sec)}
+          {formatTime(timer)}
         </div>
         <div className="text-sm text-muted-foreground mt-1">
           {game.is_match_ended ? 'MATCH ENDED' : game.current_period === 0 ? 'NOT STARTED' : `${periodLabel} ${game.current_period} of ${maxPeriods}`}
