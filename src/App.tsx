@@ -45,7 +45,9 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/auth" element={<AuthRoute />} />
+          {/* Dashboard (control panel) – uses global app_theme via ThemeInitializer */}
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          {/* Overlay – uses its own scoreboard_theme, isolated from global dark class */}
           <Route path="/overlay/:gameId" element={<Overlay />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

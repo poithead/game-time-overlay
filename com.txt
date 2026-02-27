@@ -1,0 +1,3 @@
+git add .
+git commit -m "Added voice command integration and fixed timer desync"
+git push origin main

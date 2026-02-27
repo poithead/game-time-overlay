@@ -123,7 +123,7 @@ export function MatchControls({ game, onStart, onStop, onNext, onEnd, onReset, o
         {/* Scoreboard theme and logo pickers */}
         <div className="space-y-3 pt-3">
           <div className="space-y-1">
-            <Label className="text-xs text-muted-foreground">Theme</Label>
+            <Label className="text-xs text-muted-foreground">Scoreboard Theme</Label>
             <Select
               value={game.scoreboard_theme ?? 'dark'}
               onValueChange={(v) => onUpdateGame({ scoreboard_theme: v })}
