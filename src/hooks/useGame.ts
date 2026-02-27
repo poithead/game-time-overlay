@@ -2,25 +2,26 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { Game, TeamData, GameCard } from '@/types/game';
 
-export function useGame(userId: string | undefined) {
+export function useGame(gameId: string | undefined) {
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchGame = useCallback(async () => {
-    if (!userId) return;
+    if (!gameId) {
+      setLoading(false);
+      return;
+    }
     const { data, error } = await supabase
       .from('games')
       .select('*')
-      .eq('owner_id', userId)
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .eq('id', gameId)
+      .single();
 
     if (data) {
       setGame(data as unknown as Game);
     }
     setLoading(false);
-  }, [userId]);
+  }, [gameId]);
 
   useEffect(() => {
     fetchGame();
@@ -44,15 +45,20 @@ export function useGame(userId: string | undefined) {
     return () => { supabase.removeChannel(channel); };
   }, [game?.id]);
 
-  const createGame = async () => {
+  const createGame = async (userId: string, name?: string) => {
     if (!userId) return;
+    const defaultName = name || `Game ${new Date().toLocaleDateString()}`;
     const { data, error } = await supabase
       .from('games')
-      .insert({ owner_id: userId, scoreboard_theme: 'dark' })
+      .insert({ 
+        owner_id: userId, 
+        scoreboard_theme: 'dark',
+        name: defaultName
+      })
       .select()
       .single();
-    if (data) setGame(data as unknown as Game);
-    return data;
+    if (data) return data as unknown as Game;
+    return null;
   };
 
   const updateGame = async (updates: Partial<Record<string, unknown>>) => {

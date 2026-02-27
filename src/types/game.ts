@@ -28,6 +28,8 @@ export interface GameFormat {
 export interface Game {
   id: string;
   owner_id: string;
+  name: string;
+  description?: string;
   home_team: TeamData;
   away_team: TeamData;
   game_format: GameFormat;

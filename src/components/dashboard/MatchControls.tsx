@@ -126,7 +126,20 @@ export function MatchControls({ game, onStart, onStop, onNext, onEnd, onReset, o
             <Label className="text-xs text-muted-foreground">Scoreboard Theme</Label>
             <Select
               value={game.scoreboard_theme ?? 'dark'}
-              onValueChange={(v) => onUpdateGame({ scoreboard_theme: v })}
+              onValueChange={(v) => {
+                // apply default font color based on theme unless user has overridden
+                const homeDefault = game.scoreboard_theme === 'dark' ? '#ffffff' : '#000000';
+                const awayDefault = homeDefault;
+                const newDefault = v === 'dark' ? '#ffffff' : '#000000';
+                const updates: any = { scoreboard_theme: v };
+                if (game.home_team.font_color === homeDefault) {
+                  updates.home_team = { ...game.home_team, font_color: newDefault };
+                }
+                if (game.away_team.font_color === awayDefault) {
+                  updates.away_team = { ...game.away_team, font_color: newDefault };
+                }
+                onUpdateGame(updates);
+              }}
             >
               <SelectTrigger className="bg-muted border-border h-8 text-sm">
                 <SelectValue />

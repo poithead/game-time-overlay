@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { supabase } from '@/integrations/supabase/client'; // adjust path to your Supabase client
+import { supabase } from '@/integrations/supabase/client';
 
 const ThemeInitializer = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
@@ -14,7 +14,7 @@ const ThemeInitializer = ({ children }: { children: React.ReactNode }) => {
           .eq('id', user.id)
           .single();
 
-        const isDark = profile?.app_theme === 'dark';
+        const isDark = (profile?.app_theme as string | null) === 'dark';
         document.documentElement.classList.toggle('dark', isDark);
       } catch (err) {
         console.error('App theme load error:', err);

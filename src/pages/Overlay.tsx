@@ -122,7 +122,7 @@ const Overlay = () => {
   const { gameId } = useParams<{ gameId: string }>();
   const { game, loading } = useGameRealtime(gameId);
 
-  // Mark this page as an overlay route
+  // Mark this page as an overlay route (styling isolation handled via CSS classes)
   useEffect(() => {
     document.body.classList.add('overlay-route');
     return () => {
@@ -136,9 +136,39 @@ const Overlay = () => {
     game?.timer_started_at ?? null
   );
 
+  const tickerRef = useRef<HTMLDivElement>(null);
+  const [tickerText, setTickerText] = useState<string>('');
+  const [startPos, setStartPos] = useState<number>(0);
+  const [endPos, setEndPos] = useState<number>(0);
+
+  useEffect(() => {
+    const compute = () => {
+      if (!game?.description || !tickerRef.current) return;
+      const ctx = document.createElement('canvas').getContext('2d');
+      if (!ctx) return;
+      const style = window.getComputedStyle(tickerRef.current);
+      ctx.font = style.font;
+      const desc = game.description;
+      const descWidth = ctx.measureText(desc).width;
+      const containerWidth = tickerRef.current.offsetWidth;
+      // start with text positioned just outside right edge
+      setStartPos(containerWidth);
+      // end when text has moved fully outside left edge
+      setEndPos(-descWidth);
+      setTickerText(desc);
+    };
+
+    compute();
+    window.addEventListener('resize', compute);
+    return () => window.removeEventListener('resize', compute);
+  }, [game?.description]);
+
   const light = game?.scoreboard_theme === 'light';
 
-  const scoreboardBgClass = light ? 'bg-white/90' : '';
+  // always explicitly set background based on scoreboard theme so app theme can't override
+  const scoreboardBgClass = light
+    ? '!bg-white/95 border border-gray-200'
+    : '!bg-black/95 border border-gray-800';
   const textBase = light ? 'text-black' : 'text-white';
   const textFaded = light ? 'text-black/70' : 'text-white/70';
   const vsText = light ? 'text-black/60' : 'text-white/60';
@@ -165,48 +195,75 @@ const Overlay = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={{ background: 'transparent' }}>
-      {/* League logo top-left */}
-      {game.league_logo_url && (
-        <img src={game.league_logo_url} alt="League" className="absolute top-4 left-4 h-12 w-12 object-contain drop-shadow-lg" />
-      )}
-
       {/* Channel logo top-right */}
       {game.channel_logo_url && (
         <img src={game.channel_logo_url} alt="Channel" className="absolute top-4 right-4 h-12 w-12 object-contain drop-shadow-lg" />
       )}
 
-      {/* Scoreboard bar at bottom */}
+      {/* Scoreboard bar at bottom with league logo centered above */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-4xl">
-        <motion.div
+        {/* scoreboard wrapper so logo can overlap */}
+        <div className="relative flex flex-col items-center">
+          {game.league_logo_url && (
+            <img
+              src={game.league_logo_url}
+              alt="League"
+              style={{ top: '-50%' }}
+              className="absolute left-1/2 -translate-x-1/2 h-14 w-14 object-contain drop-shadow-lg opacity-90 z-10"
+            />
+          )}
+          <motion.div
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className={`glass-scoreboard rounded-2xl px-6 py-3 flex items-center justify-between ${scoreboardBgClass}`}
+          className={`glass-scoreboard rounded-2xl overflow-hidden px-6 pt-3 pb-1.5 flex flex-col w-full ${scoreboardBgClass}`}
         >
-          {/* Home */}
-          <TeamSection team={game.home_team} side="home" light={light} />
+          {/* colored edge bars */}
+          <div className="absolute inset-y-0 left-0 w-[2%] rounded-l-2xl" style={{ backgroundColor: game.home_team.primary_color }} />
+          <div className="absolute inset-y-0 right-0 w-[2%] rounded-r-2xl" style={{ backgroundColor: game.away_team.primary_color }} />
+          {/* main row: home, center, away */}
+          <div className="relative flex items-center justify-between w-full">
+            {/* Home */}
+            <TeamSection team={game.home_team} side="home" light={light} />
 
-          {/* Center: period + timer */}
-          <div className="flex flex-col items-center px-6">
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={periodLabel()}
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 5 }}
-                className={`font-display text-xs font-extrabold uppercase tracking-widest ${periodText}`}
-              >
-                {periodLabel()}
-              </motion.span>
-            </AnimatePresence>
-            <span className={`font-display text-3xl font-extrabold tracking-wider ${timerColor}`}> 
-              {formatTime(timer)}
-            </span>
+            {/* Center: period + timer */}
+            <div className="flex flex-col items-center px-6">
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={periodLabel()}
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 5 }}
+                  className={`font-display text-xs font-extrabold uppercase tracking-widest ${periodText}`}
+                >
+                  {periodLabel()}
+                </motion.span>
+              </AnimatePresence>
+              <span className={`font-display text-3xl font-extrabold tracking-wider ${timerColor}`}> 
+                {formatTime(timer)}
+              </span>
+            </div>
+
+            {/* Away */}
+            <TeamSection team={game.away_team} side="away" light={light} />
           </div>
 
-          {/* Away */}
-          <TeamSection team={game.away_team} side="away" light={light} />
+          {/* Ticker / description row (merged) */}
+          {game.description && (
+            <div className="w-full overflow-hidden mt-1" ref={tickerRef}>
+              <div
+                className={`ticker-animation whitespace-nowrap ${light ? 'text-black' : 'text-white'}`}
+                style={{
+                  '--ticker-start': `${startPos}px`,
+                  '--ticker-end': `${endPos}px`,
+                } as React.CSSProperties}
+              >
+                {tickerText}
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
+    </div>
 
       {/* Stats overlay popup */}
       <AnimatePresence>
@@ -245,7 +302,7 @@ const Overlay = () => {
                   <h3 className="font-display text-xl font-bold" style={{ color: game.away_team.font_color }}>
                     {game.away_team.name_full}
                   </h3>
-                  <div className="font-display text-5xl font-bold text-white">{game.away_team.score}</div>
+                  <div className={`font-display text-5xl font-bold ${textBase}`}>{game.away_team.score}</div>
                   <StatsColumn team={game.away_team} light={light} />
                 </div>
               </div>
@@ -265,10 +322,10 @@ function StatsColumn({ team, light }: { team: TeamData; light: boolean }) {
         <span>Field Goals</span><span className={`font-bold ${valueText}`}>{team.field_goals}</span>
       </div>
       <div className="flex justify-between">
-        <span>PC (A:C)</span><span className={`font-bold ${valueText}`}>{team.penalty_corners_awarded}:{team.penalty_corners_converted}</span>
+        <span>Penalty Corners (A:C)</span><span className={`font-bold ${valueText}`}>{team.penalty_corners_awarded}:{team.penalty_corners_converted}</span>
       </div>
       <div className="flex justify-between">
-        <span>PS (A:C)</span><span className={`font-bold ${valueText}`}>{team.penalty_strokes_awarded}:{team.penalty_strokes_converted}</span>
+        <span>Penalty Strokes (A:C)</span><span className={`font-bold ${valueText}`}>{team.penalty_strokes_awarded}:{team.penalty_strokes_converted}</span>
       </div>
       <div className="flex justify-between">
         <span>Cards</span><span className={`font-bold ${valueText}`}>{team.cards.length}</span>

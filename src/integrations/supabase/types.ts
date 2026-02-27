@@ -20,14 +20,17 @@ export type Database = {
           channel_logo_url: string | null
           created_at: string
           current_period: number
+          description: string | null
           game_format: Json
           home_team: Json
           id: string
           is_match_ended: boolean
           is_timer_running: boolean
           league_logo_url: string | null
+          name: string
           overlay_stats_visible: boolean
           owner_id: string
+          scoreboard_theme: string
           timer_remaining_sec: number
           timer_started_at: string | null
           updated_at: string
@@ -37,14 +40,17 @@ export type Database = {
           channel_logo_url?: string | null
           created_at?: string
           current_period?: number
+          description?: string | null
           game_format?: Json
           home_team?: Json
           id?: string
           is_match_ended?: boolean
           is_timer_running?: boolean
           league_logo_url?: string | null
+          name?: string
           overlay_stats_visible?: boolean
           owner_id: string
+          scoreboard_theme?: string
           timer_remaining_sec?: number
           timer_started_at?: string | null
           updated_at?: string
@@ -54,16 +60,40 @@ export type Database = {
           channel_logo_url?: string | null
           created_at?: string
           current_period?: number
+          description?: string | null
           game_format?: Json
           home_team?: Json
           id?: string
           is_match_ended?: boolean
           is_timer_running?: boolean
           league_logo_url?: string | null
+          name?: string
           overlay_stats_visible?: boolean
           owner_id?: string
+          scoreboard_theme?: string
           timer_remaining_sec?: number
           timer_started_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          id: string
+          app_theme: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          app_theme?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          app_theme?: string
+          created_at?: string
           updated_at?: string
         }
         Relationships: []

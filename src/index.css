@@ -170,7 +170,17 @@ body.overlay-route #root {
   text-align: left !important;
 }
 
-/* less transparent scoreboard on overlay */
-body.overlay-route .glass-scoreboard {
+/* overlay route no longer forces glass background – scoreboard theme handles it */
+/* body.overlay-route .glass-scoreboard {
   background: hsla(var(--glass-overlay));
+} */
+
+/* ticker animation for scrolling descriptions on overlay */
+@keyframes ticker {
+  0% { transform: translateX(var(--ticker-start)); }
+  100% { transform: translateX(var(--ticker-end)); }
+}
+.ticker-animation {
+  animation: ticker linear infinite 15s;
+  will-change: transform;
 }

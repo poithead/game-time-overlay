@@ -4,8 +4,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
 import Auth from "./pages/Auth";
-import Dashboard from "./pages/Dashboard";
+import MyGames from "./pages/MyGames";
+import ControlPanel from "./pages/ControlPanel";
 import Overlay from "./pages/Overlay";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
@@ -36,22 +38,33 @@ function AuthRoute() {
   return user ? <Navigate to="/dashboard" replace /> : <Auth />;
 }
 
+// Init app theme on mount
+function ThemeInitializer({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  useProfile(user?.id);
+  return <>{children}</>;
+}
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-          <Route path="/auth" element={<AuthRoute />} />
-          {/* Dashboard (control panel) – uses global app_theme via ThemeInitializer */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          {/* Overlay – uses its own scoreboard_theme, isolated from global dark class */}
-          <Route path="/overlay/:gameId" element={<Overlay />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <ThemeInitializer>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/auth" element={<AuthRoute />} />
+            {/* My Games (landing page) – uses app_theme via useProfile */}
+            <Route path="/dashboard" element={<ProtectedRoute><MyGames /></ProtectedRoute>} />
+            {/* Control Panel – uses app_theme via useProfile */}
+            <Route path="/control/:gameId" element={<ProtectedRoute><ControlPanel /></ProtectedRoute>} />
+            {/* Overlay – uses scoreboard_theme, isolated from global dark class */}
+            <Route path="/overlay/:gameId" element={<Overlay />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </ThemeInitializer>
     </TooltipProvider>
   </QueryClientProvider>
 );
