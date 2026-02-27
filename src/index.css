@@ -6,6 +6,58 @@
 
 @layer base {
   :root {
+    /* === LIGHT MODE (default) === */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 20% 55%;
+
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 142 71% 45%;
+
+    /* Custom light tokens */
+    --glass: 0 0% 100% / 0.85;
+    --glass-border: 214 32% 91% / 0.6;
+    --glass-overlay: 0 0% 100% / 0.95;
+    --score-glow: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 0%;
+    --card-green: 142 71% 35%;
+    --card-yellow: 48 96% 53%;
+    --card-red: 0 84% 50%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 142 71% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 40% 96%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 32% 91%;
+    --sidebar-ring: 142 71% 45%;
+  }
+
+  .dark {
+    /* === DARK MODE (your original values moved here) === */
     --background: 222 47% 6%;
     --foreground: 210 40% 96%;
 
@@ -34,9 +86,7 @@
     --input: 217 33% 20%;
     --ring: 142 71% 45%;
 
-    --radius: 0.75rem;
-
-    /* Custom tokens */
+    /* Custom dark tokens */
     --glass: 222 47% 11% / 0.7;
     --glass-border: 217 33% 25% / 0.5;
     --glass-overlay: 222 47% 11% / 0.85;
