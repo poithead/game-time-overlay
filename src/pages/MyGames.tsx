@@ -60,6 +60,20 @@ const MyGames = () => {
     });
   };
 
+  const handleEditName = async (game: Game) => {
+    const newName = window.prompt('Enter new game name', game.name);
+    if (newName === null || newName === game.name) return;
+    const { error } = await supabase
+      .from('games')
+      .update({ name: newName })
+      .eq('id', game.id);
+    if (!error) {
+      toast({ title: 'Updated', description: 'Name saved' });
+    } else {
+      toast({ title: 'Error', description: 'Unable to save name' });
+    }
+  };
+
   const handleEditDescription = async (game: Game) => {
     const newDesc = window.prompt('Enter game description', game.description || '');
     if (newDesc === null) return; // cancelled
@@ -160,7 +174,10 @@ const MyGames = () => {
                 <div className="p-6 space-y-4">
                   {/* Game name + editable description */}
                   <div>
-                    <h3 className="font-display text-lg font-bold text-foreground line-clamp-1">
+                    <h3
+                      className="font-display text-lg font-bold text-foreground line-clamp-1 cursor-pointer"
+                      onClick={() => handleEditName(game)}
+                    >
                       {game.name}
                     </h3>
                     <p className="text-xs text-muted-foreground">
