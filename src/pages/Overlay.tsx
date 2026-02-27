@@ -253,7 +253,7 @@ const Overlay = () => {
           className="fixed h-14 w-14 object-contain drop-shadow-lg opacity-90 z-10 left-1/2 -translate-x-1/2"
           animate={{
             bottom: game.overlay_stats_visible ? 'auto' : '6.5rem',
-            top: game.overlay_stats_visible ? 'calc(50% - 10rem)' : 'auto',
+            top: game.overlay_stats_visible ? 'calc(50% - 12rem)' : 'auto',
           }}
           transition={{ duration: 0.3, ease: 'easeInOut' }}
         />
